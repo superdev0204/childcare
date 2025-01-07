@@ -1,0 +1,36 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # RewriteRule ^jobs/jobdetail http://childcarejob.org/jobs/detail [R=301,L]
+    # RewriteRule ^jobs/resume http://childcarejob.org/resumes/detail [R=301,L]
+    # RewriteRule ^jobs/newjob http://childcarejob.org/jobs/new [R=301,L]
+    # RewriteRule ^jobs/newresume http://childcarejob.org/resumes/new [R=301,L]
+
+    RewriteRule ^static/(.*)$ /$1 [L,R=301]
+    RewriteRule ^(.*)\.amp$ /$1 [R=301,L]
+
+    # Redirect image requests to IDrive
+    RewriteRule ^images/providers/(\d+)/(\d+)/(.*)$ https://v1q1.c13.e2-3.dev/childcare/$2_$3 [R=301,L]
+
+    # Redirect www to non-www
+    RewriteCond %{HTTP_HOST} ^www\.childcarecenter\.us [NC]
+    RewriteRule ^(.*)$ http://childcarecenter.us/$1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>

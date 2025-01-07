@@ -1,0 +1,41 @@
+.noliststyle{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.clearfix:after {
+    clear: both;
+    content: '';
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+
+html body {
+    .hidden{
+        display: none;
+    }
+    
+    .m0{margin: 0;}
+    .mt0{margin-top: 0;}
+    .mb0{margin-bottom: 0;}
+    .ml0{margin-left: 0;}
+    .mr0{margin-right: 0;}
+
+    .p0{padding: 0;}
+    .pt0{padding-top: 0;}
+    .pb0{padding-bottom: 0;}
+    .pl0{padding-left: 0;}
+    .pr0{padding-right: 0;}
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tl{text-align: left;}
+.tr{text-align: right;}
+.tc{text-align: center;}

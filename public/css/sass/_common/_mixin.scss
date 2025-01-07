@@ -1,0 +1,142 @@
+
+// Делает смещение элемента относительно самого себя.
+// Часто используется совместно с правилами top/left/right/bottom
+@mixin translateC($x: -50%, $y: -50%) {    
+    @include translate($x, $y);
+}
+@mixin translateX($x: 0) {
+    @include translate($x, false);
+}
+@mixin translateY($y: 0) {
+    @include translate(false, $y);
+}
+@mixin translate($x: 0, $y: 0) {    
+    @if ($x != false and $y != false) {
+        @include transform(translate($x, $y));
+    } 
+    @else if ($x != false) {
+        @include transform(translateX($x));
+    }
+    @else if ($y != false) {
+        @include transform(translateY($y));
+    }
+}
+
+// Устанавливает видимость элемента.
+@mixin visible($mode, $include-transition: true) {    
+    @if ($include-transition == true) {
+        @include transition(all 0.3s ease);
+    }
+    @if ($mode == true or $mode == 1) {        
+        opacity: 1;
+        visibility: visible;
+    }
+    @else if ($mode == false or $mode == 0) {        
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+// font-face для подключения шрифтов.
+// Был взят с https://gist.github.com/jonathantneal/d0460e5c2d5d7f9bc5e6
+// Из-за бага либо чего-то ещё, директива fonts_dir игнорится в config.rb, из-за
+// чего пришлось сделать префикс к $path: "fonts/"...
+// Примечание! Функция str-replace используется бутстраповская.
+@mixin font-face($name, $path, $weight: 400, $style: normal, $exts: eot woff ttf svg) {
+    $src: null;
+
+    $extmods: (
+        eot: "?",
+        svg: "#" + str-replace($name, " ", "_")
+    );
+
+    $formats: (
+        otf: "opentype",
+        ttf: "truetype"
+    );
+
+    @each $ext in $exts {
+        $extmod: if(map-has-key($extmods, $ext), $ext + map-get($extmods, $ext), $ext);
+        $format: if(map-has-key($formats, $ext), map-get($formats, $ext), $ext);
+        $src: append($src, url(quote("/fonts/" + $path + "." + $extmod)) format(quote($format)), comma);
+    }
+
+    @font-face {
+        font-family: quote($name);
+        font-style: $style;
+        font-weight: $weight;
+        src: $src;
+    }
+}
+
+// Миксин частых правил для псевдоэлементов
+@mixin pseudo($top: auto, $right: auto, $bottom: auto, $left: auto, $position: absolute, $content: '') {
+    content: $content;
+    position: $position;
+    top: $top;
+    right: $right;
+    bottom: $bottom;
+    left: $left;
+}
+
+// Шаблон отображения списков.
+// @todo Сделать возможным в ключе карты вёртски указывать не только брейкпоинты из библиотеки include media,
+// но и обычные медиа запросы. Чтобы Миксин был независим от сторонних библиотек.
+//
+// $tpl-map - карта вёртски для желаемых брейкпоинтов, где:
+//      @ключ - условие медиа запроса (используется библиотека include media - include-media.com)
+//      @значение - карта с ключами:
+//          @cols - количество колонок для текущего брейкпоинта
+//          @mh - горизонтальный отступ между ячейками (применяется margin-right)
+//          @mv - вертикальный отступ между ячейками (применяется margin-top)
+//
+// Примечание: крайние отступы у ячеек, граничащие с родительским контейнером, будут отсутствовать.
+//
+// Пример карты карты:
+// $tpl-map: (
+//      '>xs': (cols:1, mv:20px),
+//      '>sm': (cols:3, mh:10px, mv:10px),
+//      '>md': (cols:3, mh:30px, mv:30px),
+//      '>xl': (cols:5, mh:10px, mv:10px)    
+// );
+//
+// $child-selector - селектор потомков (если ничего не указано, будет применено правило '> *')
+//
+@mixin list-columns($tpl-map, $child-selector: null) {
+    @include flexbox((
+        display: flex,                
+        align-items: stretch,
+        flex-wrap: wrap
+    ));    
+
+    $children: if($child-selector, $child-selector, '> *');
+	$pseudo-class: if(str-index($child-selector, ".") == 1, "nth-child", "nth-of-type");
+    
+    #{$children} {
+        @each $media, $rules in $tpl-map {
+            $cols: if(map_has_key($rules, 'cols'), map_get($rules, 'cols'), null);
+            $margin-right: if(map_has_key($rules, 'mh'), map_get($rules, 'mh'), null);
+            $margin-top: if(map_has_key($rules, 'mv'), map_get($rules, 'mv'), null);                        
+            
+            @include media("#{$media}") {
+                $w: 100 / $cols;
+                $spacing: if($cols > 1, $margin-right * ($cols - 1) / $cols, 0px);                
+                
+                width: calc(#{$w}% - #{$spacing});                                                
+                
+                &:#{$pseudo-class}(n) {
+                    margin-right: $margin-right;
+                    margin-top: $margin-top;
+                }
+                
+                &:#{$pseudo-class}(#{$cols}n) {
+                    margin-right: 0;
+                }
+                
+                &:#{$pseudo-class}(-n+#{$cols}) {
+                    margin-top: 0;   
+                }
+            }
+        }
+    }
+}

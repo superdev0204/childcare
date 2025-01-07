@@ -1,0 +1,5 @@
+User-agent: *
+crawl-delay: 20
+Disallow:
+
+Sitemap: https://childcarecenter.us/sitemap_index.xml

@@ -1,0 +1,19 @@
+@charset "utf-8";
+
+@import "compass";
+//@import '_common/reset'; 
+@import '_common/variables';
+@import '_common/functions';
+@import '_common/include-media';
+@import '_common/mixin';
+@import '_amp/helper';
+
+// Sprites
+// $icons-sprite-dimensions: true;
+// $icons-layout: smart;
+// @import "icons/*.png";
+// @include all-icons-sprites();
+
+// Fonts
+@include font-face('trebuchet_msregular', 'trebuc-webfont', 400);
+@include font-face('freestyle_scriptregular', 'freescpt-webfont', 400);
